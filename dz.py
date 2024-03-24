@@ -99,7 +99,39 @@ def show_question():
                 option_buttons.append(button)
                 button.pack()
         enable_submit_button()
-
+def check_answer():
+    global question_index, score, wrong_answers, selected_answers
+    if questions[question_index]['type'] == 'radio':
+        selected_option = radio_var.get()
+        if selected_option == "":
+            messagebox.showerror("Помилка", "Ви не обрали жодної відповіді. Будь ласка, оберіть відповідь.")
+            return
+        selected_option = int(selected_option) if selected_option is not None and selected_option.isdigit() else None
+        if selected_option is None:
+            messagebox.showerror("Помилка", "Ви не обрали жодної відповіді. Будь ласка, оберіть відповідь.")
+            return
+        selected_answers.append((questions[question_index]['question'], selected_option))
+        correct_option_index = questions[question_index]['options'].index(questions[question_index]['correct_option'])
+        if selected_option == correct_option_index:
+            score += 1  # Збільшуємо бал на 1 за кожну правильну відповідь
+        else:
+            wrong_answers.append((questions[question_index]['question'], selected_option, correct_option_index))
+    elif questions[question_index]['type'] == 'checkbox':
+        selected_options = [checkbox_vars[i].get() for i in range(len(checkbox_vars)) if checkbox_vars[i].get()]
+        if not selected_options:
+            messagebox.showerror("Помилка", "Ви не обрали жодної відповіді. Будь ласка, оберіть відповідь.")
+            return
+        selected_answers.append((questions[question_index]['question'], selected_options))
+        correct_option_indices = [questions[question_index]['options'].index(option) for option in questions[question_index]['correct_option']]
+        if set(selected_options) == set(correct_option_indices) and len(selected_options) == len(correct_option_indices):
+            score += 1  # Збільшуємо бал на 1 за кожну правильну відповідь
+        else:
+            wrong_answers.append((questions[question_index]['question'], selected_options, correct_option_indices))
+    question_index += 1
+    if question_index == len(questions):
+        show_result()
+    else:
+        show_question()
 root = tk.Tk()
 root.title("Система тестування знань")
 root.configure(bg="lightblue")
