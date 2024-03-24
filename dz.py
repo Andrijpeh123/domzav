@@ -169,6 +169,44 @@ def save_results():
             file.write(f"Оцінка: {grade}\n")
 def show_result():
     show_result_window()
+def show_result_window():
+    result_window = tk.Toplevel(root)
+    result_window.title("Результати тестування")
+    result_canvas = tk.Canvas(result_window)
+    result_canvas.pack(side=tk.LEFT, fill="both", expand=True)
+    scrollbar = tk.Scrollbar(result_window, orient="vertical", command=result_canvas.yview)
+    scrollbar.pack(side=tk.RIGHT, fill="y")
+    result_canvas.configure(yscrollcommand=scrollbar.set)
+    result_frame = tk.Frame(result_canvas)
+    result_canvas.create_window((0, 0), window=result_frame, anchor="nw")
+    result_text = tk.Text(result_frame, wrap="word")
+    result_text.pack(fill="both", expand=True)
+    result_text.insert(tk.END, "Результати тестування:\n\n")
+    for i, question_data in enumerate(questions):
+        question = question_data['question']
+        correct_option = question_data['correct_option']
+        selected_answer = selected_answers[i] if i < len(selected_answers) else None
+        if question_data['type'] == 'radio':
+            selected_option = selected_answer[1] if selected_answer else None
+            result_text.insert(tk.END, f"Питання {i + 1}: {question}\nВаш вибір: {selected_option}\nПравильна відповідь: {correct_option}\n\n")
+        elif question_data['type'] == 'checkbox':
+            selected_options = selected_answer[1] if selected_answer else None
+            result_text.insert(tk.END, f"Питання {i + 1}: {question}\nВаш вибір: {', '.join(selected_options)}\nПравильна відповідь: {', '.join(correct_option)}\n\n")
+    result_text.insert(tk.END, f"Ваш результат: {score} / {len(questions)}\n")
+    percentage_score = (score / len(questions)) * 100
+    if percentage_score >= 80:
+        grade = "Відмінно"
+    elif 60 <= percentage_score < 80:
+        grade = "Добре"
+    elif 40 <= percentage_score < 60:
+        grade = "Задовільно"
+    else:
+        grade = "Незадовільно"
+    result_text.insert(tk.END, f"Оцінка: {grade}\n")
+    result_text.config(state="disabled")
+    def on_configure(event):
+        result_canvas.configure(scrollregion=result_canvas.bbox("all"))
+    result_text.bind("<Configure>", on_configure)
 root = tk.Tk()
 root.title("Система тестування знань")
 root.configure(bg="lightblue")
