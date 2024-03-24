@@ -132,6 +132,15 @@ def check_answer():
         show_result()
     else:
         show_question()
+def restart_quiz():
+    global question_index, score, wrong_answers, selected_answers
+    question_index = 0
+    score = 0
+    wrong_answers.clear()
+    selected_answers.clear()
+    show_question()
+def exit_program():
+    root.destroy()
 root = tk.Tk()
 root.title("Система тестування знань")
 root.configure(bg="lightblue")
