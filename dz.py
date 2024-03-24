@@ -141,6 +141,34 @@ def restart_quiz():
     show_question()
 def exit_program():
     root.destroy()
+def save_results():
+    filename = filedialog.asksaveasfilename(defaultextension=".txt", filetypes=[("Text files", "*.txt"), ("All files", "*.*")])
+    if filename:
+        with open(filename, 'w') as file:
+            file.write("Результати тестування:\n\n")
+            for i, question_data in enumerate(questions):
+                question = question_data['question']
+                correct_option = question_data['correct_option']
+                selected_answer = selected_answers[i] if i < len(selected_answers) else None
+                if question_data['type'] == 'radio':
+                    selected_option = selected_answer[1] if selected_answer else None
+                    file.write(f"Питання {i + 1}: {question}\nВаш вибір: {selected_option}\nПравильна відповідь: {correct_option}\n\n")
+                elif question_data['type'] == 'checkbox':
+                    selected_options = selected_answer[1] if selected_answer else None
+                    file.write(f"Питання {i + 1}: {question}\nВаш вибір: {', '.join(selected_options)}\nПравильна відповідь: {', '.join(correct_option)}\n\n")
+            file.write(f"Ваш результат: {score} / {len(questions)}\n")
+            percentage_score = (score / len(questions)) * 100
+            if percentage_score >= 80:
+                grade = "Відмінно"
+            elif 60 <= percentage_score < 80:
+                grade = "Добре"
+            elif 40 <= percentage_score < 60:
+                grade = "Задовільно"
+            else:
+                grade = "Незадовільно"
+            file.write(f"Оцінка: {grade}\n")
+def show_result():
+    show_result_window()
 root = tk.Tk()
 root.title("Система тестування знань")
 root.configure(bg="lightblue")
